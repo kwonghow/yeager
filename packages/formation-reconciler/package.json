@@ -1,0 +1,9 @@
+{
+  "name": "@yeager/reconciler",
+  "version": "0.1.0",
+  "description": "Logic for reconciling yeager internal state.",
+  "main": "index.ts",
+  "repository": "https://github.com/iantanwx/yeager",
+  "author": "Ian Tan <iantanwx@gmail.com>",
+  "license": "MIT"
+}

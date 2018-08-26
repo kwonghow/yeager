@@ -1,0 +1,9 @@
+{
+  "name": "@formation/validator",
+  "version": "0.1.0",
+  "description": "Core validation logic and interface for yeager",
+  "main": "index.ts",
+  "repository": "https://github.com/iantanwx/yeager",
+  "author": "Ian Tan <iantanwx@gmail.com>",
+  "license": "MIT"
+}

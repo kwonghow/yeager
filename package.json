@@ -1,0 +1,12 @@
+{
+  "name": "yeager",
+  "version": "0.1.0",
+  "description": "A declarative library for managing complex forms in React.",
+  "main": "dist/formation.js",
+  "repository": "https://github.com/iantanwx/yeager",
+  "author": "Ian Tan <iantanwx@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "lerna": "^3.0.3"
+  }
+}

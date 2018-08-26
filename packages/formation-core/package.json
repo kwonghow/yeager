@@ -1,0 +1,9 @@
+{
+  "name": "@yeager/core",
+  "version": "0.1.1",
+  "description": "Core components of yeager",
+  "main": "index.ts",
+  "repository": "https://github.com/iantanwx/yeager",
+  "author": "Ian Tan <iantanwx@gmail.com>",
+  "license": "MIT"
+}
