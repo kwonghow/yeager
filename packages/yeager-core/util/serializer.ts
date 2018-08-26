@@ -5,7 +5,7 @@ import isArray from 'lodash/isArray';
 import isFunction from 'lodash/isFunction';
 import isObject from 'lodash/isObject';
 import set from 'lodash/set';
-import { CompositeField, PlainField, RepeatableField } from '../model/field';
+import { CompositeField, PlainField, RepeatableField } from '../model';
 import Status from '../model/status';
 import {
   Field,

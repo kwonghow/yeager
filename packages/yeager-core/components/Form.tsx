@@ -11,11 +11,18 @@ import reduce from 'lodash/reduce';
 import set from 'lodash/set';
 import some from 'lodash/some';
 import React, { Component, ComponentType, FormEvent } from 'react';
-import { cancelable, Cancelable as CancelablePromise, isCanceled } from '@techinasia/techinasia-web-util-core/promiseUtils';
-import defaultFieldRenderMap from '../model/defaultFieldRenderMap';
-import { default as defaultTheme } from '../model/defaultTheme';
-import { PlainField } from '../model/field';
-import Validator, { CustomValidatorDictionary, FieldValue, shouldValidate, ValidationResult } from '../model/validator';
+import {
+  cancelable,
+  Cancelable as CancelablePromise,
+  isCanceled,
+} from '../util/promise';
+import { PlainField } from '../model';
+import Validator, {
+  CustomValidatorDictionary,
+  FieldValue,
+  shouldValidate,
+  ValidationResult,
+} from '../validation/validator';
 import {
   BlurEventHandler,
   CompositeFieldState,
@@ -33,7 +40,11 @@ import {
   Theme,
 } from '../types';
 import { getConstraints, getParentField, isPlainField } from '../util/field';
-import { buildFormState, fieldRenderer, resolveFieldConfig } from '../util/fieldRenderer';
+import {
+  buildFormState,
+  fieldRenderer,
+  resolveFieldConfig,
+} from '../reconciler';
 import { getFieldNameFromPath, getFormStatePath } from '../util/path';
 import populateFormData, {
   copyInternalFormId,
@@ -69,14 +80,7 @@ const defaultSerializer = {
 export default class Form extends React.Component<Props, State> {
   static defaultProps: Partial<Props> = {
     children: (fields) => (
-      <div className="root">
-        {map(fields, (field) => field)}
-        <style jsx>{`
-          .root {
-            padding: 50px;
-          }
-        `}</style>
-      </div>
+      <div className="root">{map(fields, (field) => field)}</div>
     ),
     fieldRenderMap: {},
     formData: {},
@@ -112,7 +116,10 @@ export default class Form extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const populatedFormData = populateFormData(this.state.formState, this.props.formData);
+    const populatedFormData = populateFormData(
+      this.state.formState,
+      this.props.formData,
+    );
     this.props.updateFormData(populatedFormData);
   }
 
@@ -141,7 +148,10 @@ export default class Form extends React.Component<Props, State> {
 
     // populate form data with any necessary initial values if the schema has
     // changed
-    const maybePopulatedFormData = populateFormData(nextFormState, next.formData);
+    const maybePopulatedFormData = populateFormData(
+      nextFormState,
+      next.formData,
+    );
 
     if (!isEqual(next.formData, maybePopulatedFormData)) {
       this.props.updateFormData(maybePopulatedFormData);
@@ -168,7 +178,9 @@ export default class Form extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    this.validationMap.forEach((pending: CancelablePromise) => pending.cancel());
+    this.validationMap.forEach((pending: CancelablePromise) =>
+      pending.cancel(),
+    );
     this.validationMap = null;
   }
 
@@ -264,7 +276,10 @@ export default class Form extends React.Component<Props, State> {
    * @param {string} error
    * @param {PlainField} field
    */
-  handleAsyncValidationResult = (field: PlainField, error?: string[] | { canceled: boolean }) => {
+  handleAsyncValidationResult = (
+    field: PlainField,
+    error?: string[] | { canceled: boolean },
+  ) => {
     const { formState } = this.state;
     const path = getFormStatePath(field.path);
 
@@ -282,7 +297,10 @@ export default class Form extends React.Component<Props, State> {
         if (field.status.can('valid')) {
           field.status.valid();
 
-          return f.updateFieldState({ status: clone(field.status), errors: List() });
+          return f.updateFieldState({
+            status: clone(field.status),
+            errors: List(),
+          });
         }
 
         return f.updateFieldState({ errors: List() });
@@ -330,7 +348,9 @@ export default class Form extends React.Component<Props, State> {
 
     const fieldSerializer = get(
       fieldState,
-      fieldState.type === 'repeatable' ? 'config.field.serializer' : 'config.serializer',
+      fieldState.type === 'repeatable'
+        ? 'config.field.serializer'
+        : 'config.serializer',
       {},
     );
 
@@ -389,7 +409,9 @@ export default class Form extends React.Component<Props, State> {
     if (hasErrors) {
       if (process.env.NODE_ENV !== 'production') {
         // tslint:disable-next-line
-        console.warn('handleSubmit will not fire if the form is in an error state');
+        console.warn(
+          'handleSubmit will not fire if the form is in an error state',
+        );
       }
 
       this.setState({
@@ -399,7 +421,9 @@ export default class Form extends React.Component<Props, State> {
       return;
     }
 
-    this.props.handleSubmit(populateFormData(this.state.formState, this.props.formData));
+    this.props.handleSubmit(
+      populateFormData(this.state.formState, this.props.formData),
+    );
   };
 
   reconcileFormState = (props: Props): FormState => {
@@ -433,13 +457,17 @@ export default class Form extends React.Component<Props, State> {
     switch (field.type) {
       case 'composite': {
         return field.updateFieldState({
-          value: field.value.map((subField, idx) => this.validate(subField, idx, force)).toOrderedMap(),
+          value: field.value
+            .map((subField, idx) => this.validate(subField, idx, force))
+            .toOrderedMap(),
         });
       }
 
       case 'repeatable': {
         return field.updateFieldState({
-          value: field.value.map((subField, idx) => this.validate(subField, idx, force)).toOrderedMap(),
+          value: field.value
+            .map((subField, idx) => this.validate(subField, idx, force))
+            .toOrderedMap(),
         });
       }
 
@@ -471,7 +499,10 @@ export default class Form extends React.Component<Props, State> {
         }
 
         if (validateAsync) {
-          this.addPendingValidation(field, this.validator.validateAsync(value, constraints));
+          this.addPendingValidation(
+            field,
+            this.validator.validateAsync(value, constraints),
+          );
 
           if (field.status.can('pending')) {
             field.status.pending();
@@ -499,7 +530,14 @@ export default class Form extends React.Component<Props, State> {
   };
 
   render() {
-    const { children, fieldRenderMap, formData, schema, theme, updateSchema } = this.props;
+    const {
+      children,
+      fieldRenderMap,
+      formData,
+      schema,
+      theme,
+      updateSchema,
+    } = this.props;
 
     const { formState } = this.state;
 
