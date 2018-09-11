@@ -111,6 +111,10 @@ export default class Form extends React.Component<Props, State> {
   };
 
   componentDidMount() {
+    // Ideally we don’t want to do `setState` in `cDM`, but rather assign it to
+    // `this.state` directly. But `this.reconcileFormState` logic can only be
+    // after mount, so we intentionally call it here and cause a double-render.
+    // Not ideal, but that’ll do for now.
     this.setState({ formState: this.reconcileFormState(this.props) }, () => {
       const populatedFormData = populateFormData(this.state.formState, this.props.formData);
       this.props.updateFormData(populatedFormData);
