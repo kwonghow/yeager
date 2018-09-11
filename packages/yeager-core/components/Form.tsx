@@ -110,17 +110,11 @@ export default class Form extends React.Component<Props, State> {
     }
   };
 
-  constructor(props: Props) {
-    super(props);
-    this.setState({ formState: this.reconcileFormState(props) });
-  }
-
   componentDidMount() {
-    const populatedFormData = populateFormData(
-      this.state.formState,
-      this.props.formData,
-    );
-    this.props.updateFormData(populatedFormData);
+    this.setState({ formState: this.reconcileFormState(this.props) }, () => {
+      const populatedFormData = populateFormData(this.state.formState, this.props.formData);
+      this.props.updateFormData(populatedFormData);
+    });
   }
 
   componentWillReceiveProps(next: Props) {
